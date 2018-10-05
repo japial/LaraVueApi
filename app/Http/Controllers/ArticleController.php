@@ -11,7 +11,7 @@ class ArticleController extends Controller
    
     public function index()
     {
-       $articles = Article::orderBy('id','DESC')->paginate(10);
+       $articles = Article::orderBy('id','DESC')->paginate(5);
         
        // Return collection of articles as a resource
        return ArticleResource::collection($articles);
@@ -29,7 +29,7 @@ class ArticleController extends Controller
     public function store(Request $request)
     {
         $article = new Article;
-        
+
         $article->title = $request->input('title');
         $article->body = $request->input('body');
 
