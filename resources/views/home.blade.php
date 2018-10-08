@@ -8,6 +8,19 @@
                 <div class="card-header text-center">Articles</div>
                 <div class="card-body">
                     <div class="row">
+                        <div class="col-md-10 mx-auto">
+                            <form @submit.prevent="addArticle" class="mb-3">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="Title" v-model="article.title">
+                                </div>
+                                <div class="form-group">
+                                    <textarea class="form-control" placeholder="Body" v-model="article.body"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-secondary btn-block">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-4 mx-auto">
                             
                             <ul class="pagination">
@@ -25,11 +38,13 @@
                             <div class="card card-body mb-2" v-for="article in articles" v-bind:key="article.id">
                                 <h3>@{{ article.title }}</h3>
                                 <p>@{{ article.body }}</p>
+                                <hr>
+                                <div class="button-group">
+                                    <button @click="deleteArticle(article.id)" class="btn btn-danger">Delete</button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    
                 </div>
             </div>
         </div>
@@ -79,7 +94,37 @@
                 };
                 
                 this.pagination = pagination;
-            }
+            },
+            deleteArticle(id) {
+                if (confirm('Are You Sure?')) {
+                    fetch(`api/article/${id}`, {
+                        method: 'delete'
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert('Article Removed');
+                        this.fetchArticles();
+                    })
+                    .catch(err => console.log(err));
+                }
+            },
+            addArticle() {
+                fetch('api/article', {
+                    method: 'post',
+                    body: JSON.stringify(this.article),
+                    headers: {
+                        'content-type': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    this.article.title = '';
+                    this.article.body = '';
+                    alert('Article Added');
+                    this.fetchArticles();
+                })
+                .catch(err => console.log(err));
+            } 
         }
     })
 </script>
