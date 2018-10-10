@@ -9,7 +9,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-10 mx-auto">
-                            <form @submit.prevent="addArticle" class="mb-3">
+                            <form @submit.prevent="saveArticle" class="mb-3">
                                 <div class="form-group">
                                     <input type="text" class="form-control" placeholder="Title" v-model="article.title">
                                 </div>
@@ -39,7 +39,8 @@
                                 <h3>@{{ article.title }}</h3>
                                 <p>@{{ article.body }}</p>
                                 <hr>
-                                <div class="button-group">
+                                <div class="button-group text-center">
+                                    <button @click="editArticle(article)" class="btn btn-warning">Edit</button>
                                     <button @click="deleteArticle(article.id)" class="btn btn-danger">Delete</button>
                                 </div>
                             </div>
@@ -63,7 +64,6 @@
                     title: '',
                     body: ''
                 },
-                article_id: '',
                 pagination: {},
                 edit: false
             };
@@ -108,23 +108,49 @@
                     .catch(err => console.log(err));
                 }
             },
-            addArticle() {
-                fetch('api/article', {
-                    method: 'post',
-                    body: JSON.stringify(this.article),
-                    headers: {
-                        'content-type': 'application/json'
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    this.article.title = '';
-                    this.article.body = '';
-                    alert('Article Added');
-                    this.fetchArticles();
-                })
-                .catch(err => console.log(err));
-            } 
+            saveArticle() {
+                if (this.edit === false) {
+                    // Add
+                    fetch('api/article', {
+                        method: 'post',
+                        body: JSON.stringify(this.article),
+                        headers: {
+                            'content-type': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.article.title = '';
+                        this.article.body = '';
+                        alert('Article Added');
+                        this.fetchArticles();
+                    })
+                    .catch(err => console.log(err));
+                } else {
+                    // Update
+                    fetch('api/article/'+this.article.id, {
+                        method: 'put',
+                        body: JSON.stringify(this.article),
+                        headers: {
+                            'content-type': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.article.title = '';
+                        this.article.body = '';
+                        alert('Article Updated');
+                        this.fetchArticles();
+                    })
+                    .catch(err => console.log(err));
+                }
+            },
+            editArticle(article) {
+                this.edit = true;
+                this.article.id = article.id;
+                this.article.title = article.title;
+                this.article.body = article.body;
+            }
         }
     })
 </script>
